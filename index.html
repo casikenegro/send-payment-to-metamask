@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type= "text/javascript" src="https://unpkg.com/web3@1.5.2/dist/web3.min.js"></script>
+  <script type= "text/javascript" src="https://unpkg.com/bn.js@5.2.0/lib/bn.js"></script>
+
+</head>
+<body>
+  <div>
+    <button class="pay-button">Pay</button>
+    <div id="status"></div>
+  </div>
+  <script type="text/javascript">
+    window.addEventListener('load', async () => {
+      if (window.ethereum) {
+        window.web3 = new Web3(ethereum);
+        try {
+          await ethereum.enable();
+          window.wallets = await window.web3.eth.getAccounts();
+          initPayButton()
+        } catch (err) {
+          $('#status').html('User denied account access', err)
+        }
+      } else if (window.web3) {
+        window.web3 = new Web3(web3.currentProvider)
+        initPayButton()
+      } else {
+        $('#status').html('No Metamask (or other Web3 Provider) installed')
+      }
+    })
+
+ 
+    const initPayButton = async () => {
+      $('.pay-button').click(async ()  => {
+        const to = '';
+        const from = window.wallets[0] // your wallet
+
+        //paytment in BNB or ether
+        // `to` is where funds will be send to
+        const value = window.web3.utils.toWei("0.002",'ether');
+        web3.eth.sendTransaction({
+          from,
+          to,
+          value,
+        }, (err, transactionId) => {
+          if  (err) {
+            console.log('Payment failed', err)
+            $('#status').html('Payment failed')
+          } else {
+            console.log('Payment successful', transactionId)
+            $('#status').html('Payment successful')
+          }
+        })
+
+
+        // -- send USTD
+        let tokenAddress = '0x55d398326f99059fF775485246999027B3197955' // HST contract address
+        let contractABI = [
+          // transfer
+          {
+            'constant': false,
+            'inputs': [
+              {
+                'name': '_to',
+                'type': 'address'
+              },
+              {
+                'name': '_value',
+                'type': 'uint256'
+              }
+            ],
+            'name': 'transfer',
+            'outputs': [
+              {
+                'name': '',
+                'type': 'bool'
+              }
+            ],
+            'type': 'function'
+          }
+        ]
+
+        const contract = new window.web3.eth.Contract(contractABI, tokenAddress, {from})
+        const amount =  window.web3.utils.toHex(1e18)
+        const data = await contract.methods.transfer(to,amount).send({
+          from,
+        })
+          console.log(data);
+            })
+            }
+  </script>
+</body>
+</html>
