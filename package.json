@@ -1,0 +1,19 @@
+{
+  "name": "send-payment-to-metamask",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://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@github.com/casikenegro/send-payment-to-metamask.git",
+  "author": "Jesus Ortiz",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon ./src/index.js",
+    "start": "node ./src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^6.0.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
+  }
+}
