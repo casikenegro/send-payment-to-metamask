@@ -37,4 +37,9 @@ const initPayButton = async () => {
       }
     })
     }
-</script>`
+</script>`;
+
+const key =  "llaveUltraSecreta";
+module.exports = {
+  key
+}

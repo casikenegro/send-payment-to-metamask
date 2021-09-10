@@ -1,10 +1,10 @@
 const express = require('express');
 const app = express();
-const router = require("./routes/index");
-const connection = require("./db");
+const router = require("./routes");
+const constants = require("./constants");
 const port = 3000;
 
-console.log(connection);
+app.set("key",constants.key);
 router(app);
 
 app.listen(port, () => {
