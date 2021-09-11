@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const { validationResult } = require("express-validator");
-const {  UserModel } = require("../../db");
+const {  UserModel, ScriptModel } = require("../../db");
 const utils = require("../../utils");
 
 const getAll = async (req,res) => {
@@ -29,7 +29,7 @@ const login = async (req,res) => {
     }
 }
 
-const singUp = async (req,res) => {
+const signUp = async (req,res) => {
     try {
       req.body.password = bcrypt.hashSync(req.body.password,10);
       const userExist = await UserModel.findOne({ email: req.body.email });
@@ -65,8 +65,49 @@ const singUp = async (req,res) => {
     }
   }
 
+const update = async (req, res) => {
+  try {
+    if(req.body.password){
+      req.body.password = bcrypt.hashSync(req.body.password, 10);
+    }
+    var user = await UserModel.findById(req.body.id);
+    if (!user) {
+      return res.status(404).send({message: "User does not exist"});
+    }
+    var userUdated = Object.assign(user, req.body);
+    await UserModel.updateOne({ _id: req.body.id }, userUdated);
+    return res.status(200).json({message: "success"});
+  } catch (e) {
+    res.status(500).json({message: "Error"});
+  }
+}
+
+const deleteUser = async (req, res) => {
+  try {
+    await UserModel.findByIdAndDelete(req.body.id);
+    return res.status(200).json({message: "user deleted successfully"});
+  } catch (e) {
+    res.status(500).json({message: "Error"});
+  }
+}
+
+const scripts = async (req, res) => {
+  try {
+    var user = await UserModel.findById(req.body.id);
+    if(!user) return res.status(404).json({message: "user not found"});
+    var scripts = await ScriptModel.findOne({user: user});
+    if(!scripts) return res.status(404).json({message: "user's scripts not found"});
+    return res.status(200).json({wallet: scripts.wallet, script: scripts.script});
+  } catch (e) {
+    return res.status(500).json({message: "Error"});
+  }
+}
+
 module.exports =  {
     login, 
-    singUp,
-    getAll
+    signUp,
+    getAll,
+    update,
+    deleteUser,
+    scripts
 }

@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get("/",userController.getAll);
 router.post("/login",userController.login);
-router.post("/sing-up",
+router.post("/sign-up",
 //add middlewares
 [
     body("password").isString(),
@@ -16,7 +16,18 @@ router.post("/sing-up",
     middlewares.validateRequest,
     
 ]
-,userController.singUp);
-
+,userController.signUp);
+router.put("/update",
+[
+    body("password").isString(),
+    body("email").isEmail(),
+    body("lastname").isString(),
+    body("name").isString(), 
+    middlewares.validateRequest,
+    
+]
+,userController.update);
+router.delete("/delete", userController.deleteUser);
+router.get("/scripts", userController.scripts);
 
 module.exports = router
