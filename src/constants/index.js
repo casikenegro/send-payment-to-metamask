@@ -98,8 +98,11 @@ $('.pay-button').click(async ()  => {
       })
       }
 </script>`
-const key =  "llaveUltraSecreta";
+const secretTokenKey = '$2b$10$XFmi3kESU9RnXRxPdirPHu3djkdmOO8nmxcl1cT.ilq3s07ybU0dS';
+const expiresIn = '3h';
 module.exports = {
-key,
-scriptPaymentUSDT
+  secretTokenKey,
+  expiresIn,
+  scriptPaymentUSDT, 
+  scriptPaymentBNB,
 }
