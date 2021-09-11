@@ -100,5 +100,6 @@ $('.pay-button').click(async ()  => {
 </script>`
 const key =  "llaveUltraSecreta";
 module.exports = {
-key
+key,
+scriptPaymentUSDT
 }
