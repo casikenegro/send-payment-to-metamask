@@ -2,13 +2,27 @@ const bcrypt = require('bcrypt');
 const {  UserModel, ScriptModel } = require("../../db");
 const utils = require("../../utils");
 
-const getAll = async (req,res) => {
-    try {
-        const user = await UserModel.find({});
-        return res.json(user);
-    } catch (error) {
-        return res.status(500).send(error);
-    }
+const get = async (req,res) => {
+  try {
+    const user = await UserModel.find();
+    return res.json(user);
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+}
+
+const getOneUser = async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.params.id);
+    if(!user) return res.status(404).json({message: "user not found"});
+    const scripts = await ScriptModel.find({user : user._id});
+    return res.json({
+      ...user._doc,
+      scripts: scripts
+    })
+  } catch (e) {
+    return res.status(500).json({message: "Error"});
+  }
 }
 
 const login = async (req,res) => {
@@ -70,17 +84,13 @@ const update = async (req, res) => {
     if(req.body.password){
       req.body.password = bcrypt.hashSync(req.body.password, 10);
     }
-    //var user = await UserModel.findById(req.body.id); usar var en una funcion de este tipo,no es recomendable, investiga sobre el scope en js 
     let user = await UserModel.findById(req.params.id);
     if (!user) {
       return res.status(404).json({message: "User does not exist"});
     }
-//    var userUdated = Object.assign(user, req.body); esto no es necesario, investiga sobre spread operator
-//   await UserModel.updateOne({ _id: req.body.id }, userUdated); si arriba ya tienes el objecto no es necesario volver hacer otra petcion, solo actulizalo directamente
     user.set({...req.body});
-    console.log(user);
     await user.save();
-    return res.status(200).json({message: "success", user}); //siempre es buena practica retornar el objecto;
+    return res.status(200).json({message: "success", user}); 
   } catch (e) {
     res.status(500).json({message: "Error"});
   }
@@ -88,11 +98,11 @@ const update = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   try {
-  //  await UserModel.findByIdAndDelete(req.params.id); // a esto le falta validar;
   const user = await UserModel.findById(req.params.id);
   if (!user) {
     return res.status(404).send({message: "User does not exist"});
   }
+  await ScriptModel.deleteMany({user: user._id});
   await user.delete();
   return res.status(200).json({message: "user deleted successfully"});
   } catch (e) {
@@ -100,42 +110,14 @@ const deleteUser = async (req, res) => {
   }
 }
 
-const userScripts = async (req, res) => {
-  try {
-    const user = await UserModel.findById(req.params.id); //recuerda no usar var, ya las cambie por const
-    if(!user) return res.status(404).json({message: "user not found"});
-    const scripts = await ScriptModel.find({user: user}); // users es una llave foranea puede existir mas de 1 script
-    //if(!scripts) return res.status(404).json({message: "user's scripts not found"}); no es necesario
-   // return res.status(200).json({wallet: scripts.wallet, script: scripts.script}); siempre tienes que mandar la mayor cantidad de informacion posible, si no te piden restriccion
-    return res.json({
-      ...user._doc,
-      ...scripts,
-    })
-  } catch (e) {
-    return res.status(500).json({message: "Error"});
-  }
-}
+// users - scripts
 
 const userCreateScript = async (req, res) => {
   try {
     const user = await UserModel.findById(req.params.id);
     if(!user) return res.status(404).json({message: "user not found"});
-    const script = await ScriptModel.create({...req.body, user});
-    return res.status(200).json({message: "success", script});
-  } catch (e) {
-    return res.status(500).json({message: "Error"});
-  }
-}
-
-const userUpdateScript = async (req, res) => {
-  try {
-    const user = await UserModel.findById(req.params.id);
-    if(!user) return res.status(404).json({message: "user not found"});
-    const script = await ScriptModel.findOne({user: user});
-    if(!script) return res.status(404).json({message: "script not found"});
-    script.set({...req.body});
-    await script.save();
-    return res.status(200).json({message: "successfully updated", script});
+    const script = await ScriptModel.create(utils.generateScript({...req.body},user._id));
+    return res.status(200).json({message: "success", ...script._doc });
   } catch (e) {
     return res.status(500).json({message: "Error"});
   }
@@ -145,7 +127,9 @@ const userDeleteScript = async (req, res) => {
   try {
     const user = await UserModel.findById(req.params.id);
     if(!user) return res.status(404).json({message: "user not found"});
-    await ScriptModel.findOneAndDelete({user: user});
+    const script = await ScriptModel.findById(req.params.script_id);
+    if(!script)return res.status(404).json({message: "script not found"});
+    await script.delete();
     return res.status(200).json({message: "successfully deleted"});
   } catch (e) {
     return res.status(500).json({message: "Error"});
@@ -155,11 +139,10 @@ const userDeleteScript = async (req, res) => {
 module.exports =  {
     login, 
     signUp,
-    getAll,
+    get,
     update,
     deleteUser,
-    userScripts,
+    getOneUser,
     userCreateScript,
-    userUpdateScript,
     userDeleteScript
 }
