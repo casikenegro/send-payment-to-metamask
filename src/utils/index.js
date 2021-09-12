@@ -1,8 +1,11 @@
 const jwt = require('jsonwebtoken');
-const {secretTokenKey,expiresIn} = require('../constants');
+const {secretTokenKey,expiresIn, scriptPaymentUSDT , scriptPaymentBNB } = require('../constants');
 
-const changeScript = (amountUsd,to) => {
-
+const generateScript = (amountUsd,to,type) => {
+  let text = (type === "USDT") ? scriptPaymentUSDT : scriptPaymentBNB;
+  return text
+    .replace("const amountUsd = ''; // change", `const amountUsd = ${amountUsd};`)
+    .replace("const to = ''; // change", `const to = ${to};`);
 }
 
 
@@ -18,4 +21,4 @@ const generateToken = (id)=> {
       })
 }
 
-module.exports = { refreshToken, generateToken}
+module.exports = { refreshToken, generateToken, generateScript}

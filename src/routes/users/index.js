@@ -17,17 +17,18 @@ router.post("/sign-up",
     
 ]
 ,userController.signUp);
-router.put("/update",
-[
-    body("password").isString(),
-    body("email").isEmail(),
-    body("lastname").isString(),
-    body("name").isString(), 
-    middlewares.validateRequest,
+router.put("/:id" //de usando este formato es mas comodo, para los que consulten tu api, asi no tiene que escribir 
+//,                users/update y mandar el id en el body, sino que lo pasan directamente en la url, users/aqwewq12asda
+// [
+//     body("password").isString(),  estos middleware ya no son necesario,aqui estas obligando al usuario a siempre mandar estos datos para actulizar
+//     body("email").isEmail(),       aveces simplemente quiren actualizar el password o el name
+//     body("lastname").isString(),
+//     body("name").isString(), 
+//     middlewares.validateRequest,
     
-]
+// ]
 ,userController.update);
-router.delete("/delete", userController.deleteUser);
-router.get("/scripts", userController.scripts);
+router.delete("/:id", userController.deleteUser);
+router.get("/:id", userController.userScripts);
 
 module.exports = router

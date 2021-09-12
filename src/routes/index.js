@@ -1,9 +1,9 @@
 const users = require("./users");
-const change = require("./change");
+const scripts = require("./scripts");
 
 const router = (server) => {
     server.use("/users",users);
-    server.use("/change",change);
+    server.use("/scripts",scripts);
 };
 
 module.exports = router
