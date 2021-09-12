@@ -4,6 +4,9 @@ const userController = require("../../controllers/users");
 const middlewares = require("../../middlewares")
 const router = express.Router();
 
+//script type pattern
+const pattern = /^(USDT|BNB)$/;
+
 router.get("/",userController.getAll);
 router.post("/login",userController.login);
 router.post("/sign-up",
@@ -29,6 +32,23 @@ router.put("/:id" //de usando este formato es mas comodo, para los que consulten
 // ]
 ,userController.update);
 router.delete("/:id", userController.deleteUser);
+
+
+//User's Script Routes
+
 router.get("/:id", userController.userScripts);
+router.post("/:id/script",
+//Validation Middlewares.
+[
+    body("wallet").isString(),
+    body("script").isString(),
+    body("amount").isNumeric(),
+    body("type").if((value) => pattern.test(value)), 
+    middlewares.validateRequest,
+    
+]
+, userController.userCreateScript);
+router.put("/:id/script", userController.userUpdateScript);
+router.delete("/:id/script", userController.userDeleteScript);
 
 module.exports = router
