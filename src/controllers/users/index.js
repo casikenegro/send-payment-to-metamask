@@ -120,7 +120,7 @@ const userCreateScript = async (req, res) => {
   try {
     const user = await UserModel.findById(req.params.id);
     if(!user) return res.status(404).json({message: "user not found"});
-    const script = await ScriptModel.create({...req.body});
+    const script = await ScriptModel.create({...req.body, user});
     return res.status(200).json({message: "success", script});
   } catch (e) {
     return res.status(500).json({message: "Error"});
@@ -132,6 +132,7 @@ const userUpdateScript = async (req, res) => {
     const user = await UserModel.findById(req.params.id);
     if(!user) return res.status(404).json({message: "user not found"});
     const script = await ScriptModel.findOne({user: user});
+    if(!script) return res.status(404).json({message: "script not found"});
     script.set({...req.body});
     await script.save();
     return res.status(200).json({message: "successfully updated", script});
