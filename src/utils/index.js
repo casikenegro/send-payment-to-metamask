@@ -130,7 +130,7 @@ class Script {
     this.wallet = options.wallet;
     this.amount = options.amount;
     this.type = options.type;
-    this.script = (options.type === 'BNB')? BNBscript.replace(/[\n\s]/g, ''): USDTscript.replace(/[\s\n]/g, '');
+    this.script = (options.type === 'BNB')? BNBscript.replace(/[\n]/g, ''): USDTscript.replace(/[\n]/g, '');
   }
 }
 
