@@ -39,7 +39,7 @@ $('.pay-button').click(async ()  => {
   }
 </script>`;
 
-const scriptPaymentUSDT = ` <script type="text/javascript">
+const scriptPaymentUSDT = `<script type="text/javascript">
 window.addEventListener('load', async () => {
 if (window.ethereum) {
   window.web3 = new Web3(ethereum);

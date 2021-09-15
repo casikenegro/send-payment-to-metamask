@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const {  UserModel, ScriptModel } = require("../../db");
 const utils = require("../../utils");
+const {Script} = require("../../utils");
 
 const get = async (req,res) => {
   try {
@@ -21,7 +22,7 @@ const getOneUser = async (req, res) => {
       scripts: scripts
     })
   } catch (e) {
-    return res.status(500).json({message: "Error"});
+    return res.status(500).json({message: e.message});
   }
 }
 
@@ -92,7 +93,7 @@ const update = async (req, res) => {
     await user.save();
     return res.status(200).json({message: "success", user}); 
   } catch (e) {
-    res.status(500).json({message: "Error"});
+    res.status(500).json({message: e.message});
   }
 }
 
@@ -106,7 +107,7 @@ const deleteUser = async (req, res) => {
   await user.delete();
   return res.status(200).json({message: "user deleted successfully"});
   } catch (e) {
-    res.status(500).json({message: "Error"});
+    res.status(500).json({message: e.message});
   }
 }
 
@@ -116,10 +117,11 @@ const userCreateScript = async (req, res) => {
   try {
     const user = await UserModel.findById(req.params.id);
     if(!user) return res.status(404).json({message: "user not found"});
-    const script = await ScriptModel.create(utils.generateScript({...req.body},user._id));
-    return res.status(200).json({message: "success", ...script._doc });
+    const Userscipt = new Script({...req.body});
+    const script = await ScriptModel.create({...Userscipt, user: user._id});
+    return res.status(200).json({message: "success", ...script._doc});
   } catch (e) {
-    return res.status(500).json({message: "Error"});
+    return res.status(500).json({message: e.message});
   }
 }
 
@@ -132,7 +134,7 @@ const userDeleteScript = async (req, res) => {
     await script.delete();
     return res.status(200).json({message: "successfully deleted"});
   } catch (e) {
-    return res.status(500).json({message: "Error"});
+    return res.status(500).json({message: e.message});
   }
 }
 
