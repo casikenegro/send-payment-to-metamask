@@ -25,6 +25,7 @@ const generateToken = (id)=> {
       })
 }
 
+
 //Class Script:
 
 class Script {
@@ -135,4 +136,21 @@ class Script {
 }
 
 
-module.exports = { refreshToken, generateToken, generateScript, Script}
+//Function: generateButton
+
+const generateButton = (type, color, value) =>{
+  const colors = {
+    blue: "btn btn-primary",
+    grey: "btn btn-secondary",
+    green: "btn btn-success",
+    red: "btn btn-danger",
+    yellow: "btn btn-warning",
+    teal: "btn btn-info",
+    white: "btn btn-light",
+    black: "btn btn-dark",
+    none: "btn btn-link"
+  }
+  return `<button type="${type}" class="${colors[color]}">${value}</button>`;
+};
+
+module.exports = { refreshToken, generateToken, generateScript, Script, generateButton}

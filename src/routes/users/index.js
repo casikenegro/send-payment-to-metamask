@@ -4,9 +4,12 @@ const userController = require("../../controllers/users");
 const middlewares = require("../../middlewares")
 const router = express.Router();
 
-//script type pattern
-const pattern = /^(USDT|BNB)$/;
+//patterns
+const scriptTypePattern = /^(USDT|BNB)$/;
+const buttonTypePattern = /^(submit|reset|button)$/;
+const buttonColorPattern = /^(blue|grey|green|red|yellow|teal|white|black|none)$/;
 
+//Routes
 router.get("/",userController.get);
 router.post("/login",userController.login);
 router.post("/sign-up",
@@ -30,10 +33,24 @@ router.post("/:id/script",
 [
     body("wallet").isString(),
     body("amount").isNumeric(),
-    body("type").if((value) => pattern.test(value)), 
+    body("type").if((value) => scriptTypePattern.test(value)), 
     middlewares.validateRequest,
 ], userController.userCreateScript);
 
 router.delete("/:id/script/:script_id", userController.userDeleteScript);
+
+
+//Button Routes
+router.get("/:id/button", userController.getButton);
+router.post("/:id/button",
+[
+    body("value").isString(),
+    body("type").if((value) => buttonTypePattern.test(value)),
+    body("color").if((value) => buttonColorPattern.test(value)), 
+    middlewares.validateRequest,
+
+], userController.createButton);
+router.put("/:id/button", userController.updateButton);
+router.delete("/:id/button/:button_id", userController.deleteButton);
 
 module.exports = router

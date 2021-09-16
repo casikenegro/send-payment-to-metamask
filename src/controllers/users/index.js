@@ -1,7 +1,9 @@
 const bcrypt = require('bcrypt');
-const {  UserModel, ScriptModel } = require("../../db");
+const {  UserModel, ScriptModel, ButtonModel } = require("../../db");
 const utils = require("../../utils");
 const {Script} = require("../../utils");
+
+//users controllers
 
 const get = async (req,res) => {
   try {
@@ -111,6 +113,7 @@ const deleteUser = async (req, res) => {
   }
 }
 
+
 // users - scripts
 
 const userCreateScript = async (req, res) => {
@@ -130,13 +133,71 @@ const userDeleteScript = async (req, res) => {
     const user = await UserModel.findById(req.params.id);
     if(!user) return res.status(404).json({message: "user not found"});
     const script = await ScriptModel.findById(req.params.script_id);
-    if(!script)return res.status(404).json({message: "script not found"});
+    if(!script) return res.status(404).json({message: "script not found"});
     await script.delete();
     return res.status(200).json({message: "successfully deleted"});
   } catch (e) {
     return res.status(500).json({message: e.message});
   }
 }
+
+
+
+// users - button
+
+const getButton = async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.params.id);
+    if(!user) return res.status(404).json({message: "user not found"});
+    const button = await ButtonModel.findOne({user: user._id});
+    if(!button) return res.status(404).json({message: "button not found"});
+    return res.status(200).json({message: "button found", ...button._doc});
+  } catch (e) {
+    return res.status(500).json({message: e.message});
+  }
+};
+
+const createButton = async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.params.id);
+    if(!user) return res.status(404).json({message: "user not found"});
+    const script = await ScriptModel.findOne({user: user._id});
+    if(!script) return res.status(404).json({message: "script not found"});
+    const button = await ButtonModel.create({...req.body, buttonScript: utils.generateButton(req.body.type, req.body.color, req.body.value),user: user._id, scripts: script._id});
+    return res.status(200).json({message: "button successfully created", ...button._doc});
+  } catch (e) {
+    return res.status(500).json({message: e.message});
+  }
+};
+
+const updateButton = async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.params.id);
+    if(!user) return res.status(404).json({message: "user not found"});
+    const button = await ButtonModel.findOne({user: user._id});
+    if(!button) return res.status(404).json({message: "button not found"});
+    button.set({...req.body});
+    button.set({buttonScript: utils.generateButton(button._doc.type, button._doc.color, button._doc.value)});
+    await button.save();
+    return res.status(200).json({message: "successfully udated", ...button._doc});
+  } catch (e) {
+    return res.status(500).json({message: e.message});
+  }
+};
+
+const deleteButton = async (req ,res) =>{
+  try {
+    const user = await UserModel.findById(req.params.id);
+    if(!user) return res.status(404).json({message: "user not found"});
+    const button = await ButtonModel.findById(req.params.button_id);
+    if(!button) return res.status(404).json({message: "button not found"});
+    await button.delete();
+    return res.status(200).json({message: "successfully deleted"});
+  } catch (e) {
+    return res.status(500).json({message: e.message});
+  }
+};
+
 
 module.exports =  {
     login, 
@@ -146,5 +207,9 @@ module.exports =  {
     deleteUser,
     getOneUser,
     userCreateScript,
-    userDeleteScript
+    userDeleteScript,
+    getButton,
+    createButton,
+    updateButton,
+    deleteButton
 }
