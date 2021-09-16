@@ -145,13 +145,13 @@ const userDeleteScript = async (req, res) => {
 
 // users - button
 
-const getButton = async (req, res) => {
+const getButtons = async (req, res) => {
   try {
     const user = await UserModel.findById(req.params.id);
     if(!user) return res.status(404).json({message: "user not found"});
-    const button = await ButtonModel.findOne({user: user._id});
+    const button = await ButtonModel.find({user: user._id});
     if(!button) return res.status(404).json({message: "button not found"});
-    return res.status(200).json({message: "button found", ...button._doc});
+    return res.status(200).json({message: "button found", ...button});
   } catch (e) {
     return res.status(500).json({message: e.message});
   }
@@ -161,25 +161,15 @@ const createButton = async (req, res) => {
   try {
     const user = await UserModel.findById(req.params.id);
     if(!user) return res.status(404).json({message: "user not found"});
-    const script = await ScriptModel.findOne({user: user._id});
+    const script = await ScriptModel.findOne({user: req.body.script_id});
     if(!script) return res.status(404).json({message: "script not found"});
-    const button = await ButtonModel.create({...req.body, buttonScript: utils.generateButton(req.body.type, req.body.color, req.body.value),user: user._id, scripts: script._id});
+    const button = await ButtonModel.create({
+      ...req.body, 
+      buttonScript: utils.generateButton(req.body.type, req.body.color, req.body.value),
+      user: user._id, 
+      scripts: script._id
+    });
     return res.status(200).json({message: "button successfully created", ...button._doc});
-  } catch (e) {
-    return res.status(500).json({message: e.message});
-  }
-};
-
-const updateButton = async (req, res) => {
-  try {
-    const user = await UserModel.findById(req.params.id);
-    if(!user) return res.status(404).json({message: "user not found"});
-    const button = await ButtonModel.findOne({user: user._id});
-    if(!button) return res.status(404).json({message: "button not found"});
-    button.set({...req.body});
-    button.set({buttonScript: utils.generateButton(button._doc.type, button._doc.color, button._doc.value)});
-    await button.save();
-    return res.status(200).json({message: "successfully udated", ...button._doc});
   } catch (e) {
     return res.status(500).json({message: e.message});
   }
@@ -208,8 +198,7 @@ module.exports =  {
     getOneUser,
     userCreateScript,
     userDeleteScript,
-    getButton,
+    getButtons,
     createButton,
-    updateButton,
     deleteButton
 }

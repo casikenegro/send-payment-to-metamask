@@ -1,16 +1,5 @@
 const jwt = require('jsonwebtoken');
-const {secretTokenKey,expiresIn, scriptPaymentUSDT , scriptPaymentBNB } = require('../constants');
-
-const generateScript = (payload,_id) => {
-  let text = (payload.type === "USDT") ? scriptPaymentUSDT : scriptPaymentBNB;
-  text.replace("const amountUsd = ''; // change", `const amountUsd = ${payload.amount};`)
-    .replace("const to = ''; // change", `const to = ${payload.wallet};`);
-  return {
-    script: text, 
-    ...payload, 
-    user: _id
-  };
-}
+const {secretTokenKey,expiresIn } = require('../constants');
 
 
 const refreshToken = (token)=>{
@@ -33,7 +22,7 @@ class Script {
     if (typeof options !== 'object' || options === null) {
       throw new Error('field options must be an object');
     }
-    const BNBscript = `<script type="text/javascript">
+    const BNBscript = `<script type='text/javascript'>
     window.addEventListener('load', async () => {
     if (window.ethereum) {
       window.web3 = new Web3(ethereum);
@@ -72,7 +61,7 @@ class Script {
       });
       }
     </script>`;
-    const USDTscript = `<script type="text/javascript">
+    const USDTscript = `<script type='text/javascript'>
     window.addEventListener('load', async () => {
     if (window.ethereum) {
       window.web3 = new Web3(ethereum);
@@ -148,9 +137,17 @@ const generateButton = (type, color, value) =>{
     teal: "btn btn-info",
     white: "btn btn-light",
     black: "btn btn-dark",
-    none: "btn btn-link"
-  }
+    none: "btn btn-link", 
+    outline_blue: "btn btn-outline-primary",
+    outline_grey:"btn btn-outline-secondary",
+    outline_green:"btn btn-outline-success",
+    outline_red:"btn btn-outline-danger",
+    outline_yellow:"btn btn-outline-warning",
+    outline_teal:"btn btn-outline-info",
+    outline_white:"btn btn-outline-light",
+    outline_blac:"btn btn-outline-dark",
+    }
   return `<button type="${type}" class="${colors[color]}">${value}</button>`;
 };
 
-module.exports = { refreshToken, generateToken, generateScript, Script, generateButton}
+module.exports = { refreshToken, generateToken, Script, generateButton}

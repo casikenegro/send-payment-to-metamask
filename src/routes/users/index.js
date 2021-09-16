@@ -6,7 +6,6 @@ const router = express.Router();
 
 //patterns
 const scriptTypePattern = /^(USDT|BNB)$/;
-const buttonTypePattern = /^(submit|reset|button)$/;
 const buttonColorPattern = /^(blue|grey|green|red|yellow|teal|white|black|none)$/;
 
 //Routes
@@ -19,7 +18,6 @@ router.post("/sign-up",
     body("lastname").isString(),
     body("name").isString(), 
     middlewares.validateRequest,
-    
 ]
 ,userController.signUp);
 router.put("/:id" ,userController.update);
@@ -27,7 +25,7 @@ router.delete("/:id", userController.deleteUser);
 
 
 //User's Script Routes
-router.get("/:id", userController.getOneUser);
+router.get("/:id",userController.getOneUser);
 
 router.post("/:id/script",
 [
@@ -35,22 +33,21 @@ router.post("/:id/script",
     body("amount").isNumeric(),
     body("type").if((value) => scriptTypePattern.test(value)), 
     middlewares.validateRequest,
+    
 ], userController.userCreateScript);
 
 router.delete("/:id/script/:script_id", userController.userDeleteScript);
 
 
 //Button Routes
-router.get("/:id/button", userController.getButton);
+router.get("/:id/button", userController.getButtons);
 router.post("/:id/button",
 [
     body("value").isString(),
-    body("type").if((value) => buttonTypePattern.test(value)),
     body("color").if((value) => buttonColorPattern.test(value)), 
     middlewares.validateRequest,
 
 ], userController.createButton);
-router.put("/:id/button", userController.updateButton);
 router.delete("/:id/button/:button_id", userController.deleteButton);
 
 module.exports = router

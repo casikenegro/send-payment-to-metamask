@@ -9,5 +9,5 @@ const validateRequest = async (req,res,next) => {
 }
 
 module.exports = {
-    validateRequest
+    validateRequest,
 };
