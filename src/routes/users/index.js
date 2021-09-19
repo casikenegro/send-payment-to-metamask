@@ -7,6 +7,7 @@ const router = express.Router();
 //patterns
 const scriptTypePattern = /^(USDT|BNB)$/;
 const buttonColorPattern = /^(blue|grey|green|red|yellow|teal|white|black|none)$/;
+const buttonTypePattern = /^(button|submit|reset)$/;
 
 //Routes
 router.get("/",userController.get);
@@ -44,7 +45,8 @@ router.get("/:id/button", userController.getButtons);
 router.post("/:id/button",
 [
     body("value").isString(),
-    body("color").if((value) => buttonColorPattern.test(value)), 
+    body("color").if((value) => buttonColorPattern.test(value)),
+    body("type").if((value) => buttonTypePattern.test(value)),
     middlewares.validateRequest,
 
 ], userController.createButton);

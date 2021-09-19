@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
-const {secretTokenKey,expiresIn } = require('../constants');
-
+const {secretTokenKey,expiresIn, cryptocurrenciesIDs, supportedCurrencies } = require('../constants');
+const urlApi = 'https://api.coingecko.com/api/v3';
+const https = require('https');
 
 const refreshToken = (token)=>{
   const decoded = jwt.verify(token, secretTokenKey);
@@ -150,4 +151,66 @@ const generateButton = (type, color, value) =>{
   return `<button type="${type}" class="${colors[color]}">${value}</button>`;
 };
 
-module.exports = { refreshToken, generateToken, Script, generateButton}
+
+//Function getPrice:
+
+//function to get the price of a cryptocurrency in a given currency.
+
+const getPrice = (options) => {
+  if (typeof options !== 'object' || options === null) {
+    throw new Error('field options must be an object');
+  }
+  if(!options.currency) options.currency = 'usd';
+  let parsedData;
+  const url = new URL(urlApi+'/simple/price');
+  url.search = new URLSearchParams({ ids: cryptocurrenciesIDs[options.coin], vs_currencies: options.currency});
+
+  //client request to the api to get the price
+  const request = https.get(url, (res) => {
+    const { statusCode } = res;
+    const contentType = res.headers['content-type'];
+    let error;
+    if(statusCode !== 200){
+      error = new Error(`request failed. status code: ${statusCode}`);
+    } else if(!/^application\/json/.test(contentType)) {
+      error = new Error(`invalid content-type. expected application/json but received ${contentType}`);
+    }
+    if(error){
+      console.error(error.message);
+      res.resume();
+      return;
+    }
+    res.setEncoding('utf8');
+    let rawData = '';
+    res.on('data', (chunk) => { rawData += chunk ;});
+    res.on('end', () => {
+      try {
+        parsedData = JSON.parse(rawData);
+      } catch (e) {
+        console.error(e.message);
+      }
+    });
+  }).on('error', (e) => {
+    console.error(e.message);
+  });
+  return parsedData[url.searchParams.get('ids')][options.currency];
+}
+
+
+//Function convertCurrency:
+
+//convert the value of a currency to another and return it.
+
+const convertCurrency = (options) => {
+  if (supportedCurrencies.includes(options.from)){
+    const cryptoPrice = getPrice({coin: options.to, currency: options.from});
+    const converted = (1/cryptoPrice)*options.amount;
+    return `${converted} ${options.to}`;
+  } else {
+    const cryptoPrice = getPrice({coin: options.from, currency: options.to});
+    const converted = cryptoPrice*options.amount;
+    return `${converted} ${options.to}`;
+  }
+}
+
+module.exports = { refreshToken, generateToken, Script, generateButton, getPrice, convertCurrency }

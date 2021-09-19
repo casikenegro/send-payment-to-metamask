@@ -107,7 +107,7 @@ const deleteUser = async (req, res) => {
   }
   await ScriptModel.deleteMany({user: user._id});
   await user.delete();
-  return res.status(200).json({message: "user deleted successfully"});
+  return res.status(200).json({message: "user successfully deleted"});
   } catch (e) {
     res.status(500).json({message: e.message});
   }
@@ -120,8 +120,8 @@ const userCreateScript = async (req, res) => {
   try {
     const user = await UserModel.findById(req.params.id);
     if(!user) return res.status(404).json({message: "user not found"});
-    const Userscipt = new Script({...req.body});
-    const script = await ScriptModel.create({...Userscipt, user: user._id});
+    const userScript = new Script({...req.body});
+    const script = await ScriptModel.create({...userScript, user: user._id});
     return res.status(200).json({message: "success", ...script._doc});
   } catch (e) {
     return res.status(500).json({message: e.message});
