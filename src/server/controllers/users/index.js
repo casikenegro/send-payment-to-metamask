@@ -66,21 +66,6 @@ const signUp = async (req,res) => {
   
   }
   
-  // async function recover_password(req,res){
-  //   try {
-  //     if(req.recoveryCode != process.env.RECOVERY_CODE)
-  //       res.status(401).json({message: "invalid recuperation code"})
-  //     const user  = await UserModel.findOne({ email:req.body.email });
-  //     if(!user){
-  //       res.status(422).json({message: "user no exist"});
-  //     }
-  //     const password = bcrypt.hashSync(req.body.password,10)
-  //     await UserModel.update({password},{id : user.id });
-  //     return res.status(200).json({message: "success"});
-  //   } catch (e) {
-  //     res.status(500).json({message: "Ha ocurrido un error, contacte con soporte"})
-  //   }
-  // }
 
 const update = async (req, res) => {
   try {
