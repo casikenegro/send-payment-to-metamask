@@ -1,9 +1,9 @@
-const users = require("./users");
-const scripts = require("./scripts");
+import users from './users';
+import scripts from './scripts';
 
 const router = (server) => {
-    server.use("/users",users);
-    server.use("/scripts",scripts);
+  server.use('api/users', users);
+  server.use('api/scripts', scripts);
 };
 
-module.exports = router
+module.exports = router;
