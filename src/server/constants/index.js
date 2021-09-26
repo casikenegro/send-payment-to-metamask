@@ -97,12 +97,37 @@ $('.pay-button').click(async ()  => {
     console.log(data);
       })
       }
-</script>`
+</script>`;
 const secretTokenKey = '$2b$10$XFmi3kESU9RnXRxPdirPHu3djkdmOO8nmxcl1cT.ilq3s07ybU0dS';
 const expiresIn = '3h';
+
+const cryptocurrenciesIDs = {
+  bnb: 'binancecoin',
+  btc: 'bitcoin',
+  eth: 'ethereum',
+  ltc: 'litecoin',
+  usdt: 'tether'
+}
+
+const supportedCurrencies = [
+  "usd","aed","ars","aud","bdt",
+  "bhd","bmd","brl","cad","chf",
+  "clp","cny","czk","dkk","eur",
+  "gbp","hkd","huf","idr","ils",
+  "inr","jpy","krw","kwd","lkr",
+  "mmk","mxn","myr","ngn","nok",
+  "nzd","php","pkr","pln","rub",
+  "sar","sek","sgd","thb","try",
+  "twd","uah","vef","vnd","zar",
+  "xdr","xag","xau","bits","sats"
+]
+
+
 module.exports = {
   secretTokenKey,
   expiresIn,
   scriptPaymentUSDT, 
   scriptPaymentBNB,
+  cryptocurrenciesIDs,
+  supportedCurrencies
 }

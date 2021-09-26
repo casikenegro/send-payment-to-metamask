@@ -1,31 +1,26 @@
 import passport from 'passport';
+import bcrypt from 'bcrypt';
 import { BasicStrategy } from 'passport-http';
-import boom from '@hapi/boom';
-import axios from 'axios';
-import config from '../../../config/index';
+
+import { generateToken } from '../..';
+import { UserModel } from '../../../db';
 
 passport.use(
-  new BasicStrategy((async (email, password, cb) => {
+  new BasicStrategy(async (email, password, done) => {
     try {
-      const { data, status } = await axios({
-        url: `${config.apiUrl}/api/auth/sign-in`,
-        method: 'post',
-        auth: {
-          password,
-          username: email,
-        },
-        data: {
-          apiKeyToken: config.apiKeyToken,
-        },
-      });
-
-      if (!data || status !== 200) {
-        return cb(boom.unauthorized(), false);
+      const user = await UserModel.findOne({ where: { email } });
+      if (!user) return done(null, false, { message: 'forbidden' });
+      if (await bcrypt.compare(password, user.password)) {
+        delete user.password;
+        const payload = {
+          ...user._doc,
+          token: generateToken(user._id),
+        };
+        return done(null, payload);
       }
-
-      return cb(null, data);
+      return done(error, false);
     } catch (error) {
-      cb(error);
+      return done(error, false);
     }
-  })),
+  }),
 );

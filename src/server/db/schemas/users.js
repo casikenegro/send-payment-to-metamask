@@ -1,8 +1,7 @@
 const nameSchema = "users";
 
 const schema = {
-    name: String, 
-    lastname: String, 
+    username: String, 
     email: { type: String, unique:true },
     password:String,
 };

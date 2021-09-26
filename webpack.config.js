@@ -9,11 +9,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 require('dotenv').config();
 
 const isDev = (process.env.NODE_ENV === 'development');
-const entry = ['./src/frontend/index.js'];
-
-if (isDev) {
-  entry.push('webpack-hot-middleware/client?path=/__webpack_hmr&timeout=2000&reload=true');
-}
+const entry = ['webpack-hot-middleware/client?path=/__webpack_hmr&timeout=2000&reload=true'];
 
 module.exports = {
   entry,

@@ -1,26 +1,23 @@
 import express from 'express';
-import userController from '../../controllers/users';
-import middlewares from '../../middlewares';
+import passport from 'passport';
+
+import * as userController from '../../controllers/users';
+import * as middlewares from '../../middlewares';
 
 const { body } = require('express-validator');
 
 const router = express.Router();
 
+require('../../utils/auth/strategies/basic');
 //patterns
 const scriptTypePattern = /^(USDT|BNB)$/;
 const buttonColorPattern = /^(blue|grey|green|red|yellow|teal|white|black|none)$/;
 
 //Routes
+
 router.get('/', userController.get);
-router.post('/login', userController.login);
-router.post('/sign-up',
-  [
-    body('password').isString(),
-    body('email').isEmail(),
-    body('lastname').isString(),
-    body('name').isString(),
-    middlewares.validateRequest,
-  ], userController.signUp);
+router.post('/sign-in', userController.signIn);
+router.post('/sign-up', userController.signUp);
 router.put('/:id', userController.update);
 router.delete('/:id', userController.deleteUser);
 
@@ -31,7 +28,7 @@ router.post('/:id/script',
   [
     body('wallet').isString(),
     body('amount').isNumeric(),
-    body('type').if(value => scriptTypePattern.test(value)),
+    body('type').if((value) => scriptTypePattern.test(value)),
     middlewares.validateRequest,
   ], userController.userCreateScript);
 
